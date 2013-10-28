@@ -15,8 +15,11 @@
  ***************************************************************************/
 /* Uncomment the following lines under windows */
 #define WIN32 // maybe not necessary because already define
-#define __DRIVER_CLASS__ SimpleDriver     // put here the name of your driver class
-#define __DRIVER_INCLUDE__ "SimpleDriver.h" // put here the filename of your driver h\\eader
+//#define __DRIVER_CLASS__ SimpleDriver     // put here the name of your driver class
+//#define __DRIVER_INCLUDE__ "SimpleDriver.h" // put here the filename of your driver h\\eader
+
+#define __DRIVER_CLASS__ MyDriver     // put here the name of your driver class
+#define __DRIVER_INCLUDE__ "MyDriver.h" // put here the filename of your driver h\\eader
 
 #ifdef WIN32
 #include <WinSock.h>

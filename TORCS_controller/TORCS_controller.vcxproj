@@ -11,24 +11,25 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\Code\BaseDriver.h" />
-    <ClInclude Include="..\Code\CarControl.h" />
-    <ClInclude Include="..\Code\CarState.h" />
-    <ClInclude Include="..\Code\SimpleDriver.h" />
-    <ClInclude Include="..\Code\SimpleParser.h" />
-    <ClInclude Include="..\Code\WrapperBaseDriver.h" />
+    <ClInclude Include="BaseDriver.h" />
+    <ClInclude Include="CarControl.h" />
+    <ClInclude Include="CarState.h" />
     <ClInclude Include="MyDriver.h" />
+    <ClInclude Include="SimpleDriver.h" />
+    <ClInclude Include="SimpleParser.h" />
+    <ClInclude Include="WrapperBaseDriver.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\Code\CarControl.cpp" />
-    <ClCompile Include="..\Code\CarState.cpp" />
-    <ClCompile Include="..\Code\client.cpp" />
-    <ClCompile Include="..\Code\SimpleDriver.cpp" />
-    <ClCompile Include="..\Code\SimpleParser.cpp" />
-    <ClCompile Include="..\Code\WrapperBaseDriver.cpp" />
+    <ClCompile Include="CarControl.cpp" />
+    <ClCompile Include="CarState.cpp" />
+    <ClCompile Include="client.cpp" />
+    <ClCompile Include="MyDriver.cpp" />
+    <ClCompile Include="SimpleDriver.cpp" />
+    <ClCompile Include="SimpleParser.cpp" />
+    <ClCompile Include="WrapperBaseDriver.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <Library Include="..\Code\WS2_32.Lib" />
+    <Library Include="WS2_32.Lib" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{F346503D-FAC9-4983-B0A1-3FBFABD2B442}</ProjectGuid>
