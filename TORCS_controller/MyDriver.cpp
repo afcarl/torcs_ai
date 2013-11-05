@@ -75,15 +75,71 @@ MyDriver::getGear(CarState &cs)
 
 float
 MyDriver::getSteer(CarState &cs)
-{
-	if (cs.getAngle() < 0) {
-		return -0.1;
+{	
+	float rightSensor=cs.getTrack(10);
+    // reading of sensor parallel to car axis
+    float centerSensor=cs.getTrack(9);
+    // reading of sensor at -5 degree w.r.t. car axis
+    float leftSensor =cs.getTrack(8);
+	// Check if straight line or curve
+	bool straightLine = (centerSensor > rightSensor && centerSensor > leftSensor) || (leftSensor > 190 && rightSensor > 190);
+	if (straightLine) {
+		// No need to turn on straight line
+	//	return 0;
 	}
-	if (cs.getAngle() > 0) {
-		return 0.1;
+
+	if (rightSensor < centerSensor && centerSensor < leftSensor) {
+		// Left turn
+		
+		
 	}
-	return 0;
+	return cs.getAngle() - cs.getTrackPos();
+	/*float diff = leftSensor - rightSensor;
+	cout << "Turn::Diff: " << diff << "\r\n";
+	return 1 / diff;*/
 }
+
+float MyDriver::getBrake(CarState &cs) {
+	// reading of sensor at +5 degree w.r.t. car axis
+        float rightSensor=cs.getTrack(10);
+        // reading of sensor parallel to car axis
+        float centerSensor=cs.getTrack(9);
+        // reading of sensor at -5 degree w.r.t. car axis
+        float leftSensor =cs.getTrack(8);
+
+		// Check if straight line or curve
+		bool straightLine = (centerSensor > rightSensor && centerSensor > leftSensor) || (leftSensor > 190 && rightSensor > 190);
+		if (straightLine) {
+			// No need to brake on straight line
+			return 0;
+		}
+
+		if (rightSensor < centerSensor && centerSensor < leftSensor || leftSensor < centerSensor < rightSensor) {
+			// Approaching a turn - figure out how close to the turn we are and how fast we are driving
+			// centerSensor is the distance to the curve ahead
+			// Brake amount depends on how sharp the curve is (that we are headed towards)
+			// Lower difference between right and left sensors means sharper turn
+			float diff = std::abs(rightSensor - leftSensor);
+
+			// Three factors apply 
+			// 1. Difference between left and right - small difference means sharp turn => more brake
+			// 2. Distance to edge of track - closer distance => more brake
+			// 3. Speed of car - if going slow, no need to brake. The faster the speed => more brake
+
+			float speed = cs.getSpeedX() / 3.6; // Get the speed in m/s
+			if (speed < 10) {
+				return 0;
+			}
+			float time = centerSensor / speed; // Seconds until we hit the edge of the track
+
+			float temp = 1 / time * 1 / diff;
+		//	cout << "Temp: " << temp << "\r\n";
+			float s = sigmoid(temp);
+		//	cout << "Sigmoid: " << s << "\r\n";
+			return temp;
+		}
+}
+
 float
 MyDriver::getAccel(CarState &cs)
 {
@@ -138,12 +194,77 @@ MyDriver::getAccel(CarState &cs)
 CarControl
 MyDriver::wDrive(CarState cs)
 {
+	// check if car is currently stuck
+	if ( fabs(cs.getAngle()) > stuckAngle )
+    {
+		// update stuck counter
+        stuck++;
+    }
+    else
+    {
+    	// if not stuck reset stuck counter
+        stuck = 0;
+    }
+
+	// after car is stuck for a while apply recovering policy
+    if (stuck > stuckTime)
+    {
+    	/* set gear and sterring command assuming car is 
+    	 * pointing in a direction out of track */
+    	
+    	// to bring car parallel to track axis
+        float steer = - cs.getAngle() / steerLock; 
+        int gear=-1; // gear R
+        
+        // if car is pointing in the correct direction revert gear and steer  
+        if (cs.getAngle()*cs.getTrackPos()>0)
+        {
+            gear = 1;
+            steer = -steer;
+        }
+
+        // Calculate clutching
+        clutching(cs,clutch);
+
+        // build a CarControl variable and return it
+        CarControl cc (1.0,0.0,gear,steer,clutch);
+        return cc;
+    }
+
 	int gear = getGear(cs);
 	float steer = getSteer(cs);
+	float accel = getAcceleration(cs);
+	float brake = getBrake(cs);
+	accel = 1 - 2 * brake;
         // build a CarControl variable and return it
-	CarControl cc(1,0,gear,steer,0);
-        return cc;
-    
+	CarControl cc(accel,brake,gear,steer,0); // float accel, float brake, int gear, float steer, float clutch, int focus=0 (implicit)
+    return cc;
+}
+
+float MyDriver::sigmoid(float x)
+{
+     float exp_value;
+     float return_value;
+
+     /*** Exponential calculation ***/
+     exp_value = exp((double) -x);
+
+     /*** Final sigmoid value ***/
+     return_value = 1 / (1 + 20 * exp_value);
+
+     return return_value;
+}
+
+float MyDriver::getAcceleration(CarState &cs)
+{
+	float accel = 1;
+	float frontSensor = cs.getTrack(9);
+	float leftSensor = cs.getTrack(8);
+	float rightSensor = cs.getTrack(10);
+	if (leftSensor != rightSensor) {
+	//	accel = frontSensor / 200;
+	}
+	return accel;
 }
 
 float

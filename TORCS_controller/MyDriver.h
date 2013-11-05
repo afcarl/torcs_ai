@@ -109,9 +109,16 @@ private:
 	
 	// Solves the gear changing subproblems
 	float getAccel(CarState &cs);
+
+	float getAcceleration(CarState &cs);
 	
 	// Apply an ABS filter to brake command
 	float filterABS(CarState &cs,float brake);
+
+	// Get the amount of brake required for a turn
+	float getBrake(CarState &cs);
+
+	float sigmoid(float x);
 
 	// Solves the clucthing subproblems
 	void clutching(CarState &cs, float &clutch);
